@@ -1,51 +1,70 @@
 const fs = require('fs');
-const inquirer = require('nquirer');
-const {Triangle, Circle, Square} = require('./lib/shapes.js');
+const inquirer = require('inquirer');
+const { Triangle, Circle, Square } = require('./lib/shapes.js');
 
-class Svg {
+class SVG {
     constructor() {
         this.textEl = '';
         this.shapeEl = '';
     }
     render() {
-        return `<<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"${this.shapeEl}${this.textEl}></svg>`;
+        return `<svg version="1.1" width="100" height="100"${this.shapeEl}${this.textEl}></svg>`;
     }
-    setTextEl(text, color){
-        this.textEl = `<text x='100' y='75' font-size='50 text-anchor='middle' fill='${text}'>${color}</text>`
+    setTextEl(text, color) {
+        this.textEl = `<text x='100' y='75' font-size='50 text-anchor='middle' fill='${color}'>${text}</text>`
     }
-    setShapeEl(text, color){
+    setShapeEl(shape) {
         this.shapeEl = shape.render()
     }
 }
 
 function promptUser() {
     inquirer.prompt([
-       {
-        name: 'text',
-        message: 'Please enter up to Three(3) characters.'
-       },
-       {
-        name: 'text-color',
-        message: 'Please enter a color or a hexidecimal number you want for the text'
-       },
-       {
-        name: 'shape-color',
-        message: 'Please enter a color or hexidecimal number you want for the shape'
-       },
-       {
-        type: 'list',
-        name: 'shapes',
-        message: 'Please pick which shape you would like ',
-        choices: ['Traingle', 'Circle', 'Square'],
-       },
-    ]),
+        {
+            name: 'text',
+            message: 'Please enter up to Three(3) characters.'
+        },
+        {
+            name: 'textColor',
+            message: 'Please enter a color or a hexidecimal number you want for the text'
+        },
+        {
+            name: 'shapeColor',
+            message: 'Please enter a color or hexidecimal number you want for the shape'
+        },
+        {
+            type: 'list',
+            name: 'shapes',
+            message: 'Please pick which shape you would like ',
+            choices: ['Triangle', 'Circle', 'Square'],
+        },
+    ]).then(function (answers) {
+        let shape;
+        switch (answers.shapes) {
+            case 'Triangle':
+                shape = new Triangle();
+                break;
+            case 'Circle':
+                shape = new Circle();
+                break;
+            case 'Square':
+                shape = new Square();
+                break;
+        }
 
-    fs.writeFile('./logo.svg', svgContent, (err) => {
-        if (err) throw err;
-    });
+        shape.setColor(answers.shapeColor)
+
+        const svg = new SVG();
+        svg.setTextEl(answers.text, answers.textColor)
+        svg.setShapeEl(shape)
+
+        return fs.writeFile('logo.svg', svg.render(), (err) => {
+            if (err) throw err;
+        });
+    })
 };
 
-function init() {}
+function init() { }
 promptUser();
 
 init();
