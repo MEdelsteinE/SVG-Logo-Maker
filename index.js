@@ -8,10 +8,10 @@ class SVG {
         this.shapeEl = '';
     }
     render() {
-        return `<svg version="1.1" width="100" height="100"${this.shapeEl}${this.textEl}></svg>`;
+        return `<svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="100" height="100">${this.shapeEl}${this.textEl}</svg>`;
     }
     setTextEl(text, color) {
-        this.textEl = `<text x='100' y='75' font-size='50 text-anchor='middle' fill='${color}'>${text}</text>`
+        this.textEl = `<text x="50%" y="50%" font-size="50px" text-anchor="middle" fill="${color}">${text}</text>`
     }
     setShapeEl(shape) {
         this.shapeEl = shape.render()
@@ -54,12 +54,14 @@ function promptUser() {
 
         shape.setColor(answers.shapeColor)
 
-        const svg = new SVG();
+        var svg = new SVG();
         svg.setTextEl(answers.text, answers.textColor)
         svg.setShapeEl(shape)
+        const svgContent = svg.render();
 
-        return fs.writeFile('logo.svg', svg.render(), (err) => {
+        return fs.writeFile('logo.svg', svgContent, (err) => {
             if (err) throw err;
+           
         });
     })
 };
